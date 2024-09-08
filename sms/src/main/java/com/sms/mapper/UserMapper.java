@@ -1,12 +1,18 @@
-package com.sms.sms.mapper;
+package com.sms.mapper;
 
+import com.sms.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.sms.sms.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author sms
+ * @since 2024-09-08
+ */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-    List<User> listAll();
+
 }
