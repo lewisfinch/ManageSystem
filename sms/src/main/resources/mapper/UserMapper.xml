@@ -4,15 +4,15 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.sms.entity.User">
-        <id column="id" property="id" />
-        <result column="no" property="no" />
-        <result column="name" property="name" />
-        <result column="password" property="password" />
-        <result column="age" property="age" />
-        <result column="sex" property="sex" />
-        <result column="phone" property="phone" />
-        <result column="role_id" property="roleId" />
-        <result column="isValid" property="isvalid" />
+        <id column="id" property="id"/>
+        <result column="no" property="no"/>
+        <result column="name" property="name"/>
+        <result column="password" property="password"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="phone" property="phone"/>
+        <result column="role_id" property="roleId"/>
+        <result column="isValid" property="isvalid"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

@@ -2,16 +2,20 @@ package com.sms.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sms.common.QueryPageParam;
 import com.sms.entity.User;
 import com.sms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author sms
@@ -25,35 +29,49 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/list")
-    public List<User> List(){
+    public List<User> List() {
         return userService.list();
     }
 
     //新增
     @PostMapping("/save")
-    public boolean save(@RequestBody User user){
+    public boolean save(@RequestBody User user) {
         return userService.save(user);
     }
+
     //修改
     @PostMapping("/mod")
-    public boolean mod(@RequestBody User user){
+    public boolean mod(@RequestBody User user) {
         return userService.updateById(user);
     }
+
     //新增或修改
     @PostMapping("/saveOrMod")
-    public boolean saveOrMod(@RequestBody User user){
+    public boolean saveOrMod(@RequestBody User user) {
         return userService.saveOrUpdate(user);
     }
+
     //删除
     @GetMapping("/delete")
-    public boolean delete(Integer id){
+    public boolean delete(Integer id) {
         return userService.removeById(id);
     }
+
     //查询
-    @PostMapping("/listP")
-    public List<User> listP(@RequestBody User user){
+    @PostMapping("/listPage")
+    public List<User> listPage(@RequestBody QueryPageParam query) {
+
+        HashMap param = query.getParam();
+        String name = (String) param.get("name");
+        Page<User> page = new Page<>(query.getPageNum(), query.getPageSize());
+
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper();
-        lambdaQueryWrapper.eq(User::getName, user.getName());
-        return userService.list(lambdaQueryWrapper);
+        lambdaQueryWrapper.like(User::getName, name);
+
+        IPage result = userService.page(page, lambdaQueryWrapper);
+
+        System.out.println("total==" + result.getTotal());
+        return result.getRecords();
     }
+
 }
