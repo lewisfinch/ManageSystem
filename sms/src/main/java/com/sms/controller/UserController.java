@@ -3,6 +3,7 @@ package com.sms.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sms.common.QueryPageParam;
 import com.sms.common.Result;
@@ -72,6 +73,16 @@ public class UserController {
 
         System.out.println("total==" + result.getTotal());
         return Result.suc(result.getRecords(), result.getTotal());
+    }
+
+    @PostMapping("/listP")
+    public List<User> listP(@RequestBody User user) {
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper();
+        if (StringUtils.isNotBlank(user.getName())) {
+            lambdaQueryWrapper.like(User::getName, user.getName());
+        }
+        return userService.list(lambdaQueryWrapper);
     }
 
 }
