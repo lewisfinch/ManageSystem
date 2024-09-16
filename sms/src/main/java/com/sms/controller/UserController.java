@@ -59,6 +59,12 @@ public class UserController {
         return userService.removeById(id);
     }
 
+    @GetMapping("/findByNo")
+    public Result findByNo(@RequestParam String no) {
+        List list = userService.lambdaQuery().eq(User::getNo, no).list();
+        return list.size() > 0 ? Result.suc() : Result.fail();
+    }
+
     //查询
     @PostMapping("/listPage")
     public Result listPage(@RequestBody QueryPageParam query) {

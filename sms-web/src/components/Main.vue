@@ -8,6 +8,31 @@ const item = {
   name: 'Tom',
   address: 'No. 189, Grove St, Los Angeles',
 }
+
+let checkAge = (rule, value, callback) => {
+  if (value > 150) {
+    callback(new Error('年龄输⼊过⼤'));
+  } else {
+    callback();
+  }
+};
+
+let checkDuplicate = (rule, value, callback) => {
+  if (form.value.id) {
+    return callback();
+  }
+  axios.get("/user/findByNo?no=" + form.value.no).then(res => res.data).then(res => {
+    if (res.code != 200) {
+      callback()
+    } else {
+      callback(new Error('账号已经存在'));
+    }
+  }).catch(error => {
+    console.error("请求出错:", error);
+    callback(new Error('验证失败'));
+  });
+};
+
 const tableData = ref(Array.from({length: 20}).fill(item))
 const pageNum = ref(1)
 const pageSize = ref(10)
@@ -26,6 +51,32 @@ const sexes = ref([{
     value: '0',
     label: '女',
   }])
+const rules = ref({
+  no: [
+    {required: true, message: '请输入名字', trigger: 'blur'},
+    {min: 3, max: 8, message: '长度在3到8个字符', trigger: 'blur'},
+    {validator: checkDuplicate, trigger: 'blur'}
+  ],
+  name: [
+    {required: true, message: '请输入名字', trigger: 'blur'},
+  ],
+  password: [
+    {required: true, message: '请输入密码', trigger: 'blur'},
+    {min: 3, max: 8, message: '长度在3到8个字符', trigger: 'blur'}
+  ],
+  age: [
+    {required: true, message: '请输⼊年龄', trigger: 'blur'},
+    {min: 1, max: 3, message: '⻓度在 1 到 3 个位', trigger: 'blur'},
+    {pattern: /^([1-9][0-9]*){1,3}$/, message: '年龄必须为正整数字', trigger: "blur"},
+    {validator: checkAge, trigger: 'blur'}
+  ],
+  phone: [
+    {required: true, message: "⼿机号不能为空", trigger: "blur"},
+    {
+      pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输⼊正确的⼿机号码", trigger: "blur"
+    }
+  ]
+})
 const centerDialogVisible = ref(false)
 const form = ref({no: '', name: '', password: '', age: '', phone: '', sex: '0', roleId: '1'})
 
@@ -37,24 +88,42 @@ function loadGet() {
   })
 }
 
+const formRef = ref(null);
+
 function save() {
-  axios.post('/user/save', form.value).then(res => res.data).then(res => {
-    console.log(res)
-    if (res.code == 200) {
-      ElMessage({
-        message: '操作成功！',
-        type: 'success',
-      })
-      centerDialogVisible.value = false;
-      loadPost();
-    } else {
-      ElMessage({
-        message: '操作失败！',
-        type: 'error',
-      })
-    }
-  })
+  if (formRef.value) {
+    formRef.value.validate((valid: boolean) => {
+      if (valid) {
+        axios.post('/user/save', form.value).then(res => res.data).then(res => {
+          console.log(res);
+
+          if (res.code == 200) {
+            ElMessage({
+              message: '操作成功！',
+              type: 'success',
+            });
+            centerDialogVisible.value = false;
+            loadPost();
+          } else {
+            ElMessage({
+              message: '操作失败！',
+              type: 'error',
+            });
+          }
+        }).catch(error => {
+          console.error('请求出错:', error);
+          ElMessage({
+            message: '网络错误，操作失败！',
+            type: 'error',
+          });
+        });
+      } else {
+        console.log('表单验证失败');
+      }
+    });
+  }
 }
+
 
 function loadPost() {
   axios.post('/user/listPage', {
@@ -84,7 +153,14 @@ function resetParam() {
 }
 
 function add() {
+  resetForm()
   centerDialogVisible.value = true;
+}
+
+function resetForm() {
+  if (formRef.value) {
+    formRef.value.resetFields();
+  }
 }
 
 const handleSizeChange = (val: number) => {
@@ -184,23 +260,23 @@ onBeforeMount(() => {
         width="500"
         align-center
     >
-      <el-form :model="form" label-width="auto" style="max-width: 600px">
-        <el-form-item label="账号">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="auto" style="max-width: 600px">
+        <el-form-item label="账号" prop="no">
           <el-col :span="20">
             <el-input v-model="form.no"/>
           </el-col>
         </el-form-item>
-        <el-form-item label="姓名">
+        <el-form-item label="姓名" prop="name">
           <el-col :span="20">
             <el-input v-model="form.name"/>
           </el-col>
         </el-form-item>
-        <el-form-item label="年龄">
+        <el-form-item label="年龄" prop="age">
           <el-col :span="20">
             <el-input v-model="form.age"/>
           </el-col>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-col :span="20">
             <el-input v-model="form.password"/>
           </el-col>
@@ -211,7 +287,7 @@ onBeforeMount(() => {
             <el-radio value="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="电话">
+        <el-form-item label="电话" prop="phone">
           <el-col :span="20">
             <el-input v-model="form.phone"/>
           </el-col>
