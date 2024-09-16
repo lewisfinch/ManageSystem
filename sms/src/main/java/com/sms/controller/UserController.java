@@ -67,7 +67,9 @@ public class UserController {
         Page<User> page = new Page<>(query.getPageNum(), query.getPageSize());
 
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper();
-        lambdaQueryWrapper.like(User::getName, name);
+        if (StringUtils.isNotBlank(name) && !"null".equals(name)) {
+            lambdaQueryWrapper.like(User::getName, name);
+        }
 
         IPage result = userService.page(page, lambdaQueryWrapper);
 
