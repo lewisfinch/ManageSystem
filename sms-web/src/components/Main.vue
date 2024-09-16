@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {inject, onBeforeMount, ref} from "vue";
 import {Search} from '@element-plus/icons-vue'
+import {ElMessage} from "element-plus";
 
 const item = {
   date: '2016-05-02',
@@ -25,12 +26,33 @@ const sexes = ref([{
     value: '0',
     label: '女',
   }])
+const centerDialogVisible = ref(false)
+const form = ref({no: '', name: '', password: '', age: '', phone: '', sex: '0', roleId: '1'})
 
 function loadGet() {
   axios.get('/user/list').then(res => res.data).then(res => {
     console.log(res)
   }).catch(error => {
     console.error(error)
+  })
+}
+
+function save() {
+  axios.post('/user/save', form.value).then(res => res.data).then(res => {
+    console.log(res)
+    if (res.code == 200) {
+      ElMessage({
+        message: '操作成功！',
+        type: 'success',
+      })
+      centerDialogVisible.value = false;
+      loadPost();
+    } else {
+      ElMessage({
+        message: '操作失败！',
+        type: 'error',
+      })
+    }
   })
 }
 
@@ -61,6 +83,10 @@ function resetParam() {
   loadPost()
 }
 
+function add() {
+  centerDialogVisible.value = true;
+}
+
 const handleSizeChange = (val: number) => {
   console.log(`${val} items per page`)
   pageNum.value = 1;
@@ -76,8 +102,8 @@ const handleCurrentChange = (val: number) => {
 onBeforeMount(() => {
   loadPost()
 })
-
 </script>
+
 
 <template>
   <div>
@@ -99,6 +125,8 @@ onBeforeMount(() => {
       </el-select>
       <el-button type="primary" style="margin-left: 5px;" @click="loadPost">查询</el-button>
       <el-button type="success" @click="resetParam">重置</el-button>
+      <el-button type="success" @click="add">新增</el-button>
+
     </div>
     <el-scrollbar>
       <el-table :data="tableData"
@@ -149,6 +177,56 @@ onBeforeMount(() => {
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
     />
+
+    <el-dialog
+        v-model="centerDialogVisible"
+        title="Warning"
+        width="500"
+        align-center
+    >
+      <el-form :model="form" label-width="auto" style="max-width: 600px">
+        <el-form-item label="账号">
+          <el-col :span="20">
+            <el-input v-model="form.no"/>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-col :span="20">
+            <el-input v-model="form.name"/>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="年龄">
+          <el-col :span="20">
+            <el-input v-model="form.age"/>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-col :span="20">
+            <el-input v-model="form.password"/>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-radio-group v-model="form.sex">
+            <el-radio value="1">男</el-radio>
+            <el-radio value="0">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-col :span="20">
+            <el-input v-model="form.phone"/>
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="save">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
   </div>
 </template>
 
