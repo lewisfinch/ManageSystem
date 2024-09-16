@@ -14,5 +14,5 @@ const axiosInstance = axios.create({
 });
 
 app.provide('$axios', axiosInstance);
-app.use(ElementPlus)
+app.use(ElementPlus, {size: 'small'});
 app.mount('#app')

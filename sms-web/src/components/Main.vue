@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {inject, onBeforeMount, ref} from "vue";
+import {Search} from '@element-plus/icons-vue'
 
 const item = {
   date: '2016-05-02',
@@ -9,11 +10,21 @@ const item = {
 const tableData = ref(Array.from({length: 20}).fill(item))
 const pageNum = ref(1)
 const pageSize = ref(10)
+const name = ref('')
 const total = ref(0)
 const size = ref<ComponentSize>('default')
 const background = ref(false)
 const disabled = ref(false)
 const axios = inject('$axios');
+const sex = ref('')
+const sexes = ref([{
+  value: '1',
+  label: '男',
+},
+  {
+    value: '0',
+    label: '女',
+  }])
 
 function loadGet() {
   axios.get('/user/list').then(res => res.data).then(res => {
@@ -26,7 +37,11 @@ function loadGet() {
 function loadPost() {
   axios.post('/user/listPage', {
     pageSize: pageSize.value,
-    pageNum: pageNum.value
+    pageNum: pageNum.value,
+    param: {
+      name: name.value,
+      sex: sex.value
+    }
   }).then(res => res.data).then(res => {
     console.log(res)
     if (res.code == 200) {
@@ -38,6 +53,12 @@ function loadPost() {
   }).catch(error => {
     console.error(error)
   })
+}
+
+function resetParam() {
+  name.value = ''
+  sex.value = ''
+  loadPost()
 }
 
 const handleSizeChange = (val: number) => {
@@ -60,6 +81,25 @@ onBeforeMount(() => {
 
 <template>
   <div>
+    <div style="margin-bottom: 5px">
+      <el-input v-model="name" :suffix-icon="Search" placeholder="请输入名字" style="width: 200px"
+                @keyup.enter.native="loadPost"></el-input>
+      <el-select
+          v-model="sex"
+          filterable
+          placeholder="请选择性别"
+          style="width: 240px; margin-left: 5px"
+      >
+        <el-option
+            v-for="item in sexes"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+        />
+      </el-select>
+      <el-button type="primary" style="margin-left: 5px;" @click="loadPost">查询</el-button>
+      <el-button type="success" @click="resetParam">重置</el-button>
+    </div>
     <el-scrollbar>
       <el-table :data="tableData"
                 :header-cell-style="{background: '#f2f5fc'}"
