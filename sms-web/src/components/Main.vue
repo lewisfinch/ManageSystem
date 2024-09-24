@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {inject, onBeforeMount, ref} from "vue";
+import {inject, nextTick, onBeforeMount, ref} from "vue";
 import {Search} from '@element-plus/icons-vue'
 import {ElMessage} from "element-plus";
 
@@ -78,7 +78,7 @@ const rules = ref({
   ]
 })
 const centerDialogVisible = ref(false)
-const form = ref({no: '', name: '', password: '', age: '', phone: '', sex: '0', roleId: '1'})
+const form = ref({id: '', no: '', name: '', password: '', age: '', phone: '', sex: '0', roleId: '1'})
 
 function loadGet() {
   axios.get('/user/list').then(res => res.data).then(res => {
@@ -90,33 +90,55 @@ function loadGet() {
 
 const formRef = ref(null);
 
+function doSave() {
+  axios.post('/user/save', form.value).then(res => res.data).then(res => {
+    console.log(res);
+
+    if (res.code == 200) {
+      ElMessage({
+        message: '操作成功！',
+        type: 'success',
+      });
+      centerDialogVisible.value = false;
+      loadPost();
+    } else {
+      ElMessage({
+        message: '操作失败！',
+        type: 'error',
+      });
+    }
+  })
+}
+
+function doMod() {
+  axios.post('/user/update', form.value).then(res => res.data).then(res => {
+    console.log(res);
+
+    if (res.code == 200) {
+      ElMessage({
+        message: '操作成功！',
+        type: 'success',
+      });
+      centerDialogVisible.value = false;
+      loadPost();
+    } else {
+      ElMessage({
+        message: '操作失败！',
+        type: 'error',
+      });
+    }
+  })
+}
+
 function save() {
   if (formRef.value) {
     formRef.value.validate((valid: boolean) => {
       if (valid) {
-        axios.post('/user/save', form.value).then(res => res.data).then(res => {
-          console.log(res);
-
-          if (res.code == 200) {
-            ElMessage({
-              message: '操作成功！',
-              type: 'success',
-            });
-            centerDialogVisible.value = false;
-            loadPost();
-          } else {
-            ElMessage({
-              message: '操作失败！',
-              type: 'error',
-            });
-          }
-        }).catch(error => {
-          console.error('请求出错:', error);
-          ElMessage({
-            message: '网络错误，操作失败！',
-            type: 'error',
-          });
-        });
+        if (form.value.id) {
+          doMod();
+        } else {
+          doSave();
+        }
       } else {
         console.log('表单验证失败');
       }
@@ -155,6 +177,26 @@ function resetParam() {
 function add() {
   resetForm()
   centerDialogVisible.value = true;
+}
+
+function mod(row) {
+  centerDialogVisible.value = true;
+  nextTick(() => {
+    form.value.id = row.id
+    form.value.no = row.no
+    form.value.name = row.name
+    form.value.password = ''
+    form.value.age = row.age + ''
+    form.value.sex = row.sex + ''
+    form.value.phone = row.phone
+    form.value.roleId = row.roleId
+  })
+
+
+}
+
+function del() {
+
 }
 
 function resetForm() {
@@ -236,8 +278,10 @@ onBeforeMount(() => {
         </el-table-column>
         <el-table-column prop="phone" label="电话" width="180"/>
         <el-table-column prop="operate" label="操作">
-          <el-button size="small" type="success">编辑</el-button>
-          <el-button size="small" type="danger">删除</el-button>
+          <template v-slot="scope">
+            <el-button size="small" type="success" @click="mod(scope.row)">编辑</el-button>
+            <el-button size="small" type="danger" @click="del">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
     </el-scrollbar>
