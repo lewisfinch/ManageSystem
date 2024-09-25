@@ -195,8 +195,23 @@ function mod(row) {
 
 }
 
-function del() {
+function del(id) {
+  axios.get('/user/del?id=' + id).then(res => res.data).then(res => {
+    console.log(res);
 
+    if (res.code == 200) {
+      ElMessage({
+        message: '操作成功！',
+        type: 'success',
+      });
+      loadPost();
+    } else {
+      ElMessage({
+        message: '操作失败！',
+        type: 'error',
+      });
+    }
+  })
 }
 
 function resetForm() {
@@ -280,7 +295,13 @@ onBeforeMount(() => {
         <el-table-column prop="operate" label="操作">
           <template v-slot="scope">
             <el-button size="small" type="success" @click="mod(scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="del">删除</el-button>
+            <el-popconfirm title="确定删除吗？"
+                           @confirm="del(scope.row.id)"
+                           style="margin-left: 5px;">
+              <template #reference>
+                <el-button size="small" type="danger">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>

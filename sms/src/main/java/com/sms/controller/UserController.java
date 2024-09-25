@@ -59,6 +59,11 @@ public class UserController {
         return userService.saveOrUpdate(user);
     }
 
+    @GetMapping("/del")
+    public Result del(@RequestParam String id) {
+        return userService.removeById(id) ? Result.suc() : Result.fail();
+    }
+
     //删除
     @GetMapping("/delete")
     public boolean delete(Integer id) {
