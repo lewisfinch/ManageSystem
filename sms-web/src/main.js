@@ -4,6 +4,7 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import './assets/global.css'
 import axios from "axios";
+import router from './router';
 
 const app = createApp(App)
 
@@ -14,5 +15,6 @@ const axiosInstance = axios.create({
 });
 
 app.provide('$axios', axiosInstance);
+app.use(router);
 app.use(ElementPlus, {size: 'small'});
 app.mount('#app')

@@ -47,6 +47,14 @@ public class UserController {
         return userService.updateById(user) ? Result.suc() : Result.fail();
     }
 
+    //登录
+    @PostMapping("/login")
+    public Result login(@RequestBody User user) {
+        List<User> list = userService.lambdaQuery().eq(User::getNo, user.getNo())
+                .eq(User::getPassword, user.getPassword()).list();
+        return !list.isEmpty() ? Result.suc(list.get(0)) : Result.fail();
+    }
+
     //修改
     @PostMapping("/mod")
     public boolean mod(@RequestBody User user) {
