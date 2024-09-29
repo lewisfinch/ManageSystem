@@ -10,7 +10,15 @@ const routes = [
     {
         path: '/Index',
         name: 'index',
-        component: () => import('../components/index.vue') // 懒加载组件
+        component: () => import('../components/index.vue'), // 懒加载组件
+        children: [{
+            path: '/Home',
+            name: 'home',
+            meta: {
+                title: '首页'
+            },
+            component: () => import('../components/Home.vue')
+        }]
     }
 ];
 
@@ -19,5 +27,10 @@ const router = createRouter({
     history: createWebHistory(), // 使用 HTML5 History 模式
     routes // 路由配置
 });
+
+const VueRouterPush = createRouter.prototype.push
+createRouter.prototype.push = function push(to) {
+    return VueRouterPush.call(this, to).catch(err => err)
+}
 
 export default router; // 导出路由实例

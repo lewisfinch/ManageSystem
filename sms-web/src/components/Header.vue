@@ -8,6 +8,7 @@ defineOptions({
 
 function toUser() {
   console.log('to_user')
+  router.push("/Home")
 }
 
 function logout() {
@@ -22,6 +23,8 @@ const user = JSON.parse(sessionStorage.getItem('CurUser'))
 function collapse() {
   emitCollapse("doCollapse");
 }
+
+router.push('/Home')
 
 </script>
 

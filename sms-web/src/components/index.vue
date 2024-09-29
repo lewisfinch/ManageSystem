@@ -12,7 +12,7 @@
       </el-header>
 
       <el-main style="height: 100%">
-        <Main  />
+        <router-view/>
       </el-main>
 
     </el-container>
@@ -22,7 +22,6 @@
 <script lang="ts" setup>
 import Aside from "@/components/Aside.vue";
 import Header from "@/components/Header.vue";
-import Main from "@/components/Main.vue";
 import {ref} from "vue";
 
 const isCollapse = ref(false)
@@ -32,9 +31,9 @@ defineOptions({
   name: 'Index'
 })
 
-function doCollapse(){
+function doCollapse() {
   isCollapse.value = !isCollapse.value
-  if(!isCollapse.value){
+  if (!isCollapse.value) {
     aside_width.value = '200px'
   } else {
     aside_width.value = '64px'
@@ -48,16 +47,20 @@ function doCollapse(){
   //background-color: var(--el-color-primary-light-7);
   color: var(--el-text-color-primary);
 }
+
 .layout-container-demo .el-aside {
   color: var(--el-text-color-primary);
   background: var(--el-color-primary-light-8);
 }
+
 .layout-container-demo .el-menu {
   border-right: none;
 }
+
 .layout-container-demo .el-main {
   padding: 0;
 }
+
 .layout-container-demo .toolbar {
   display: inline-flex;
   align-items: center;
