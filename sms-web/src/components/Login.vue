@@ -66,7 +66,7 @@ const confirm = () => {
             .then((res) => {
               const data = res.data;
               if (data.code === 200) {
-                sessionStorage.setItem("CurUser", JSON.stringify(data.data.user));
+                sessionStorage.setItem("CurUser", JSON.stringify(data.data));
                 router.replace('/Index');
               } else {
                 confirm_disabled.value = false;

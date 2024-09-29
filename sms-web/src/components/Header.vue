@@ -1,21 +1,25 @@
 <script setup>
-import {ArrowDown, Fold, Setting, Switch} from "@element-plus/icons-vue";
+import {ArrowDown, Switch} from "@element-plus/icons-vue";
+import router from "@/router/index.js";
 
 defineOptions({
   name: 'Header'
 })
 
-function toUser(){
+function toUser() {
   console.log('to_user')
 }
 
-function logout(){
+function logout() {
   console.log('logout')
+  router.push("/")
+  sessionStorage.clear()
 }
 
 const emitCollapse = defineEmits(['doCollapse'])
+const user = JSON.parse(sessionStorage.getItem('CurUser'))
 
-function collapse(){
+function collapse() {
   emitCollapse("doCollapse");
 }
 
@@ -24,13 +28,18 @@ function collapse(){
 <template>
   <div class="toolbar" style="display: flex; line-height: 60px">
     <div>
-      <el-icon style="font-size: 20px; margin-top: 25px; cursor: pointer" @click="collapse"><Switch /></el-icon>
+      <el-icon style="font-size: 20px; margin-top: 25px; cursor: pointer" @click="collapse">
+        <Switch/>
+      </el-icon>
     </div>
-  <div style="flex: 1; text-align: center; font-size: 20px;">
+    <div style="flex: 1; text-align: center; font-size: 20px;">
       <span>欢迎来到仓库管理系统</span>
     </div>
-    <span>Tom</span><el-dropdown>
-    <el-icon><ArrowDown /></el-icon>
+    <span>{{ user.name }}</span>
+    <el-dropdown>
+      <el-icon>
+        <ArrowDown/>
+      </el-icon>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click.native="toUser">个人资料</el-dropdown-item>
